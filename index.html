@@ -182,9 +182,7 @@
         </div>
         
         <div class="timer">เวลา: <span id="timer-display"></span></div>
-        <div id="leaderboard-area" class="screen">
-        <div class="filter-container">
-        <select id="leaderboard-filter">
+        
         <div id="graphic-resistor" style="display:none;">
             <div class="resistor-wrapper">
                 <div class="wire" id="res-wire-left"></div>
@@ -378,25 +376,37 @@ const db = getDatabase(app);
     }
 
     function executeClearLeaderboard() {
-        let filterVal = document.getElementById("leaderboard-filter").value;
-        if(filterVal === "all") {
-            remove(ref(db,"leaderboard"));
+
+    if(confirm("ต้องการล้างคะแนนทั้งหมดใช่หรือไม่?")){
+
+        remove(ref(db,"leaderboard"))
+        .then(()=>{
+            alert("ล้างคะแนนเรียบร้อย");
             renderLeaderboardTable();
-            alert("ล้างข้อมูลคะแนนกระดาน 'ทุกหมวดหมู่' เรียบร้อยครับ");
-        } else {
-            let scoresData = JSON.parse(localStorage.getItem("splitLeaderboardV2")) || [];
-            let newData = scoresData.filter(d => d.gameId !== filterVal); 
-            localStorage.setItem("splitLeaderboardV2", JSON.stringify(newData));
-            renderLeaderboardTable();
-            alert("ล้างข้อมูลคะแนนเฉพาะหมวดนี้เรียบร้อยครับ");
-        }
+        });
+
     }
 
+}
+
     // ================= การจัดการหน้าจอ =================
-    function showScreen(screenId) {
-        document.querySelectorAll('.screen').forEach(el => el.style.display = 'none');
-        document.getElementById(screenId).style.display = 'block';
-    }
+    function showScreen(screenId){
+
+    const screens = [
+        "login-area",
+        "hub-area",
+        "setup-area",
+        "game-area",
+        "leaderboard-area"
+    ];
+
+    screens.forEach(id=>{
+        document.getElementById(id).style.display="none";
+    });
+
+    document.getElementById(screenId).style.display="block";
+
+}
 
     function login() {
         let nameInput = document.getElementById("player-name").value.trim();
@@ -686,63 +696,77 @@ const db = getDatabase(app);
     showLeaderboard();
 }
 
-    function showLeaderboard() {
-        showScreen("leaderboard-area");
-        let filterDropdown = document.getElementById("leaderboard-filter");
-        if(activeGame !== "") { filterDropdown.value = activeGame; } else { filterDropdown.value = "all"; }
-        renderLeaderboardTable();
-    }
+   function showLeaderboard() {
 
-   function renderLeaderboardTable() {
-    const levelFilter =
-    document.getElementById("level-filter").value;
+    showScreen("leaderboard-area");
+
+    document.getElementById("leaderboard-filter").value = "all";
+    document.getElementById("level-filter").value = "all";
+
+    renderLeaderboardTable();
+
+}
+
+  function renderLeaderboardTable() {
+
     const tbody =
     document.querySelector("#leaderboard-table tbody");
 
-    onValue(ref(db,"leaderboard"),(snapshot)=>{
+    const gameFilter =
+    document.getElementById("leaderboard-filter").value;
 
-        tbody.innerHTML="";
+    const levelFilter =
+    document.getElementById("level-filter").value;
 
-        let scores=[];
-        const filterVal =
-        document.getElementById("leaderboard-filter").value;
+    onValue(ref(db,"leaderboard"), (snapshot)=>{
+
+        let scores = [];
+
         snapshot.forEach((child)=>{
             scores.push(child.val());
         });
-        
-        if(filterVal !== "all"){
-    scores = scores.filter(
-        item => item.gameId === filterVal
-    );
-}
 
-if(levelFilter !== "all"){
-    scores = scores.filter(
-        item => item.level === levelFilter
-    );
-}
-        
-        scores.sort((a,b)=>b.score-a.score);
+        // กรองตามเกม
+        if(gameFilter !== "all"){
+            scores = scores.filter(
+                item => item.gameId === gameFilter
+            );
+        }
+
+        // กรองตามระดับ
+        if(levelFilter !== "all"){
+            scores = scores.filter(
+                item => item.level === levelFilter
+            );
+        }
+
+        // เรียงคะแนน
+        scores.sort((a,b)=> b.score - a.score);
+
+        tbody.innerHTML = "";
 
         scores.slice(0,10).forEach((data,index)=>{
 
-            let icon =
-            index===0?"🥇":
-            index===1?"🥈":
-            index===2?"🥉":
-            index+1;
+            let medal = "";
+
+            if(index===0) medal="🥇";
+            else if(index===1) medal="🥈";
+            else if(index===2) medal="🥉";
+            else medal=index+1;
 
             tbody.innerHTML += `
             <tr>
-                <td>${icon}</td>
-                <td><b>${data.name}</b></td>
+                <td>${medal}</td>
+                <td>${data.name}</td>
                 <td>${data.modeLabel}</td>
                 <td>${data.level}</td>
                 <td>${data.score}</td>
-            </tr>`;
+            </tr>
+            `;
         });
 
     });
+
 }
 window.login = login;
 window.logout = logout;
