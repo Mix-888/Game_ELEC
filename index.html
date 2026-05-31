@@ -1,0 +1,664 @@
+<!DOCTYPE html>
+<html lang="th">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>ศูนย์รวมเกมอิเล็กทรอนิกส์ - โดย ครูทศกฤษณ์ จิตติปกรณ์รักษ์</title>
+    <style>
+        @import url('https://fonts.googleapis.com/css2?family=Sarabun:wght@400;600;700&display=swap');
+        body { font-family: 'Sarabun', sans-serif; text-align: center; background-color: #e2e8f0; padding: 20px; color: #2d3748; margin: 0; }
+        h1 { color: #2b6cb0; font-weight: 700; font-size: 32px; margin-bottom: 10px; }
+        .container { max-width: 800px; margin: 0 auto; background: white; padding: 30px; border-radius: 15px; box-shadow: 0 10px 25px rgba(0,0,0,0.1); position: relative; }
+        
+        input[type="text"], input[type="password"], select { padding: 12px; font-size: 18px; border-radius: 8px; border: 1px solid #cbd5e0; width: 85%; margin-bottom: 15px; font-family: 'Sarabun', sans-serif; box-sizing: border-box; }
+        
+        .btn { padding: 12px 25px; margin: 8px; font-size: 18px; cursor: pointer; border: none; border-radius: 8px; font-family: 'Sarabun', sans-serif; font-weight: 600; transition: 0.2s; }
+        .btn-primary { background-color: #3182ce; color: white; }
+        .btn-primary:hover { background-color: #2b6cb0; }
+        .btn-success { background-color: #38a169; color: white; width: 85%; font-size: 20px; }
+        .btn-success:hover { background-color: #2f855a; }
+        .btn-danger { background-color: #e53e3e; color: white; }
+        .btn-danger:hover { background-color: #c53030; }
+        .btn-warning { background-color: #d69e2e; color: white; }
+        .btn-warning:hover { background-color: #b7791f; }
+        .btn-purple { background-color: #805ad5; color: white; }
+        .btn-purple:hover { background-color: #6b46c1; }
+        
+        .menu-btn { display: block; width: 85%; margin: 15px auto; padding: 20px; font-size: 22px; border-radius: 12px; border: none; cursor: pointer; font-weight: bold; transition: 0.3s; color: white; }
+        .btn-resistor { background: linear-gradient(135deg, #f6ad55, #dd6b20); }
+        .btn-capacitor { background: linear-gradient(135deg, #68d391, #38a169); }
+        .btn-inductor { background: linear-gradient(135deg, #9f7aea, #6b46c1); }
+        .btn-unit { background: linear-gradient(135deg, #63b3ed, #3182ce); }
+        .menu-btn:hover { transform: scale(1.02); box-shadow: 0 5px 15px rgba(0,0,0,0.2); }
+        
+        .choice-btn { display: block; width: 100%; margin: 10px 0; background-color: #fff; color: #2d3748; border: 2px solid #3182ce; text-align: left; padding: 15px; font-size: 18px; border-radius: 8px; box-sizing: border-box; }
+        .choice-btn:hover { background-color: #ebf8ff; }
+        
+        .screen { display: none; }
+        #login-area { display: block; }
+        
+        /* === กราฟิกตัวต้านทาน === */
+        .resistor-wrapper { margin: 40px 0; display: flex; justify-content: center; align-items: center; position: relative; height: 140px;}
+        .res-axial { width: 240px; height: 60px; background-color: #f6e05e; border-radius: 10px; display: flex; justify-content: space-between; padding: 0 15px; box-sizing: border-box; border: 1px solid #d69e2e; z-index: 2;}
+        .band { height: 100%; width: 20px; }
+        .wire { width: 50px; height: 8px; background-color: #a0aec0; z-index: 1;}
+        .res-smd { width: 140px; height: 80px; background-color: #1a202c; border-radius: 4px; display: flex; justify-content: center; align-items: center; border: 3px solid #718096; box-shadow: inset 1px 1px 5px rgba(255,255,255,0.1); z-index: 2; margin: 0 auto;}
+        .res-smd-code { font-size: 38px; font-weight: 700; color: #edf2f7; font-family: monospace; letter-spacing: 2px; }
+
+        /* === กราฟิกตัวเก็บประจุ === */
+        .capacitor-wrapper { margin: 30px 0; display: flex; flex-direction: column; align-items: center; position: relative; height: 160px; justify-content: flex-end; }
+        .cap-ceramic { width: 120px; height: 120px; background-color: #dd6b20; border-radius: 50%; display: flex; justify-content: center; align-items: center; box-shadow: inset -5px -5px 15px rgba(0,0,0,0.3), 3px 3px 10px rgba(0,0,0,0.2); z-index: 2; }
+        .cap-mylar { width: 140px; height: 90px; background-color: #2f855a; border-radius: 10px; display: flex; justify-content: center; align-items: center; box-shadow: inset -3px -3px 10px rgba(0,0,0,0.3), 3px 3px 10px rgba(0,0,0,0.2); z-index: 2; }
+        .cap-electro { width: 90px; height: 140px; background-color: #2d3748; border-radius: 8px; display: flex; flex-direction: row; position: relative; overflow: hidden; box-shadow: inset -5px -5px 15px rgba(0,0,0,0.5), 3px 3px 10px rgba(0,0,0,0.2); z-index: 2; }
+        .electro-text-area { flex: 1; display: flex; flex-direction: column; justify-content: center; align-items: center; color: #fff; font-weight: 700; line-height: 1.2; }
+        .electro-val { font-size: 22px; }
+        .electro-volt { font-size: 18px; color: #ecc94b; }
+        .electro-stripe { width: 25px; background-color: #cbd5e0; display: flex; flex-direction: column; justify-content: space-around; align-items: center; font-size: 24px; font-weight: bold; color: #2d3748; }
+        .capacitor-code { font-size: 32px; font-weight: 700; color: #fff; text-shadow: 1px 1px 2px #000; letter-spacing: 2px; }
+        .capacitor-legs { display: flex; gap: 40px; margin-top: -5px; z-index: 1; }
+        .leg { width: 6px; height: 50px; background-color: #a0aec0; border-radius: 0 0 5px 5px; }
+        .is-electro .leg:nth-child(2) { height: 30px; } 
+
+        /* === กราฟิกตัวเหนี่ยวนำ === */
+        .inductor-wrapper { margin: 40px 0; display: flex; justify-content: center; align-items: center; position: relative; height: 140px; }
+        .ind-axial { width: 220px; height: 75px; background-color: #38b2ac; border-radius: 25px; display: flex; justify-content: space-between; padding: 0 20px; box-sizing: border-box; border: 2px solid #285e61; z-index: 2;}
+        .ind-band { height: 100%; width: 18px; }
+        .ind-smd { width: 120px; height: 120px; background-color: #1a202c; border-radius: 8px; display: flex; justify-content: center; align-items: center; border: 4px solid #718096; box-shadow: inset 2px 2px 5px rgba(255,255,255,0.1); z-index: 2; }
+        .ind-code { font-size: 36px; font-weight: 700; color: #e2e8f0; font-family: monospace; letter-spacing: 3px; }
+
+        .question-box { background-color: #2d3748; color: #ecc94b; padding: 25px; border-radius: 12px; margin: 25px 0; box-shadow: inset 0 0 10px rgba(0,0,0,0.5); }
+        .question-text { font-size: 26px; font-weight: bold; }
+        .question-subtext { font-size: 18px; color: #e2e8f0; margin-top: 5px; }
+
+        .status-bar { display: flex; justify-content: space-between; font-size: 18px; font-weight: 600; background: #edf2f7; padding: 10px 20px; border-radius: 8px; margin-bottom: 20px; border: 1px solid #e2e8f0; }
+        .timer { color: #e53e3e; font-weight: 700; font-size: 20px; }
+        #feedback { font-size: 22px; font-weight: bold; margin: 10px 0; height: 30px; }
+        .correct { color: #38a169; }
+        .wrong { color: #e53e3e; }
+
+        /* การกรองตารางคะแนน */
+        .filter-container { background: #ebf8ff; padding: 15px; border-radius: 8px; margin-bottom: 20px; border: 1px solid #90cdf4; }
+        table { width: 100%; border-collapse: collapse; margin-top: 10px; font-size: 16px; }
+        th, td { padding: 12px; border-bottom: 1px solid #e2e8f0; }
+        th { background-color: #3182ce; color: white; }
+        tr:hover { background-color: #f7fafc; }
+        .medal { font-size: 22px; }
+        
+        .footer { margin-top: 40px; font-size: 14px; color: #718096; border-top: 1px solid #e2e8f0; padding-top: 15px; }
+
+        /* หน้าต่าง Admin Modal */
+        .modal-overlay { position: fixed; top: 0; left: 0; width: 100%; height: 100%; background: rgba(0,0,0,0.7); display: none; justify-content: center; align-items: center; z-index: 9999; }
+        .modal-content { background: white; padding: 30px; border-radius: 15px; width: 90%; max-width: 400px; box-shadow: 0 10px 30px rgba(0,0,0,0.5); text-align: center; }
+        .modal-content h3 { color: #e53e3e; margin-top: 0; font-size: 24px; }
+        .modal-content p { color: #4a5568; margin-bottom: 20px; }
+    </style>
+</head>
+<body>
+
+<div class="container">
+    <h1>⚡ ศูนย์รวมเกมอิเล็กทรอนิกส์ ⚡</h1>
+    
+    <div id="login-area" class="screen">
+        <h2>ยินดีต้อนรับเข้าสู่บทเรียน!</h2>
+        <p>กรุณาตั้งชื่อผู้เล่นเพื่อเข้าสู่ระบบจัดอันดับ</p>
+        <input type="text" id="player-name" placeholder="กรอกชื่อ-สกุล หรือรหัสนักศึกษา..." maxlength="30">
+        <br>
+        <button class="btn btn-success" onclick="login()">เข้าสู่ระบบ</button>
+    </div>
+
+    <div id="hub-area" class="screen">
+        <h2>สวัสดี, <span id="display-player-name" style="color:#3182ce;"></span>!</h2>
+        <p>เลือกเกมที่ต้องการฝึกทักษะ</p>
+        
+        <button class="menu-btn btn-resistor" onclick="openSetup('resistor')">1. เกมอ่านค่าตัวต้านทาน (Color/SMD)</button>
+        <button class="menu-btn btn-capacitor" onclick="openSetup('capacitor')">2. เกมอ่านค่าตัวเก็บประจุ</button>
+        <button class="menu-btn btn-inductor" onclick="openSetup('inductor')">3. เกมอ่านค่าตัวเหนี่ยวนำ</button>
+        <button class="menu-btn btn-unit" onclick="openSetup('unit')">4. เกมแปลงหน่วยทางไฟฟ้า</button>
+        
+        <br>
+        <button class="btn btn-warning" onclick="showLeaderboard()">🏆 ดูตารางคะแนนรวม</button>
+        <button class="btn btn-purple" onclick="requestAdminAccess('history')">🔄 ล้างประวัติคำถาม (เตรียมสอบ)</button>
+        <button class="btn btn-danger" onclick="logout()">ออกจากระบบ</button>
+    </div>
+
+    <div id="setup-area" class="screen">
+        <h2 id="setup-title">ตั้งค่าเกม</h2>
+        
+        <div id="resistor-options" style="display:none;">
+            <p>เลือกโหมดตัวต้านทาน:</p>
+            <select id="resistor-type">
+                <option value="4">🎨 โหมด 4 แถบสี</option>
+                <option value="5">🎨 โหมด 5 แถบสี</option>
+                <option value="smd">🔲 โหมด รหัสตัวเลข (SMD)</option>
+            </select>
+        </div>
+
+        <div id="capacitor-options" style="display:none;">
+            <p>เลือกประเภทตัวเก็บประจุ:</p>
+            <select id="capacitor-type">
+                <option value="all">🎲 สุ่มทุกแบบ (เซรามิก, ไมลาร์, อิเล็กโทรไลต์)</option>
+                <option value="ceramic">🟠 เซรามิก (Ceramic)</option>
+                <option value="mylar">🟩 ไมลาร์ (Mylar)</option>
+                <option value="electro">🔋 อิเล็กโทรไลต์ (Electrolytic)</option>
+            </select>
+        </div>
+
+        <div id="inductor-options" style="display:none;">
+            <p>เลือกประเภทตัวเหนี่ยวนำ (หน่วยพื้นฐาน µH):</p>
+            <select id="inductor-type">
+                <option value="all">🎲 สุ่มทุกแบบ (แถบสี, รหัสตัวเลข SMD)</option>
+                <option value="color">🎨 แบบแถบสี (4 แถบ)</option>
+                <option value="smd">🔲 แบบรหัสตัวเลข (SMD)</option>
+            </select>
+        </div>
+
+        <div id="unit-options" style="display:none;">
+            <p>เลือกหมวดหมู่หน่วยทางไฟฟ้า:</p>
+            <select id="unit-type">
+                <option value="all">🎲 สุ่มทุกหน่วย (โอห์ม, โวลต์, แอมแปร์)</option>
+                <option value="ohm">🔴 ความต้านทาน (Ohm: Ω, kΩ, MΩ)</option>
+                <option value="volt">🟡 แรงดันไฟฟ้า (Volt: mV, V, kV)</option>
+                <option value="amp">🔵 กระแสไฟฟ้า (Ampere: µA, mA, A)</option>
+            </select>
+        </div>
+
+        <p>เลือกระดับความยาก (1 รอบ = 10 ข้อ):</p>
+        <select id="difficulty-select">
+            <option value="beginner">🟢 ผู้เริ่มต้น (ไม่จับเวลา, ข้อละ 10 คะแนน)</option>
+            <option value="intermediate">🟡 ปานกลาง (ข้อละ 15 วิ, ข้อละ 15 คะแนน, ผิดหัก 5)</option>
+            <option value="expert">🔴 ผู้เชี่ยวชาญ (ข้อละ 8 วิ, ข้อละ 20 คะแนน, ผิดหัก 10)</option>
+        </select>
+        
+        <br><br>
+        <button class="btn btn-primary" style="width: 85%; font-size: 20px;" onclick="startGame()">▶ เริ่มทำแบบทดสอบ</button>
+        <button class="btn btn-danger" onclick="showScreen('hub-area')">กลับเมนูหลัก</button>
+    </div>
+
+    <div id="game-area" class="screen">
+        <div class="status-bar">
+            <span>เกม: <span id="game-title-text" style="color:#3182ce;"></span></span>
+            <span>ข้อที่: <span id="question-count">1</span>/10</span>
+            <span>คะแนน: <span id="score" style="color:#38a169;">0</span></span>
+        </div>
+        
+        <div class="timer">เวลา: <span id="timer-display"></span></div>
+
+        <div id="graphic-resistor" style="display:none;">
+            <div class="resistor-wrapper">
+                <div class="wire" id="res-wire-left"></div>
+                <div id="resistor-body" class="res-axial"></div>
+                <div class="wire" id="res-wire-right"></div>
+            </div>
+        </div>
+
+        <div id="graphic-capacitor" style="display:none;">
+            <div class="capacitor-wrapper" id="cap-wrapper">
+                <div id="capacitor-body" class="cap-ceramic"></div>
+                <div class="capacitor-legs"><div class="leg"></div><div class="leg"></div></div>
+            </div>
+        </div>
+
+        <div id="graphic-inductor" style="display:none;">
+            <div class="inductor-wrapper">
+                <div class="wire" id="ind-wire-left"></div>
+                <div id="inductor-body" class="ind-axial"></div>
+                <div class="wire" id="ind-wire-right"></div>
+            </div>
+        </div>
+
+        <div id="graphic-unit" style="display:none;">
+            <div class="question-box">
+                <div class="question-subtext">แปลงค่าหน่วยต่อไปนี้ให้ถูกต้อง</div>
+                <div class="question-text" id="unit-question-display"></div>
+            </div>
+        </div>
+
+        <div id="feedback"></div>
+        <div id="choices-container"></div>
+    </div>
+
+    <div id="leaderboard-area" class="screen">
+        <h2>🏆 กระดานผู้นำ (Top 10) 🏆</h2>
+        
+        <div class="filter-container">
+            <label for="leaderboard-filter"><b>เลือกดูคะแนนหมวด: </b></label>
+            <select id="leaderboard-filter" onchange="renderLeaderboardTable()" style="width: auto; margin-bottom: 0; padding: 8px;">
+                <option value="all">🌟 รวมทุกเกม (All)</option>
+                <option value="resistor">ตัวต้านทาน (Resistor)</option>
+                <option value="capacitor">ตัวเก็บประจุ (Capacitor)</option>
+                <option value="inductor">ตัวเหนี่ยวนำ (Inductor)</option>
+                <option value="unit">แปลงหน่วย (Unit Conversion)</option>
+            </select>
+        </div>
+
+        <table id="leaderboard-table">
+            <thead>
+                <tr>
+                    <th>อันดับ</th>
+                    <th>ชื่อผู้เล่น</th>
+                    <th>รูปแบบ</th>
+                    <th>ระดับ</th>
+                    <th>คะแนน</th>
+                </tr>
+            </thead>
+            <tbody>
+            </tbody>
+        </table>
+        <br>
+        <button class="btn btn-primary" onclick="showScreen('hub-area')">กลับหน้าหลัก</button>
+        <button class="btn btn-danger" onclick="requestAdminAccess('leaderboard')">ล้างข้อมูลคะแนน</button>
+    </div>
+    
+    <div class="footer">
+        พัฒนาสื่อการเรียนการสอนโดย <b>ครูทศกฤษณ์ จิตติปกรณ์รักษ์</b> | วิทยาลัยเทคนิคเกษตรวิสัย
+    </div>
+</div>
+
+<div id="admin-modal" class="modal-overlay">
+    <div class="modal-content">
+        <h3>🔒 ยืนยันสิทธิ์ผู้สอน</h3>
+        <p>กรุณาเข้าสู่ระบบด้วยสิทธิ์ Admin เพื่อดำเนินการล้างข้อมูล</p>
+        <input type="text" id="admin-id" placeholder="ID ผู้ดูแลระบบ" autocomplete="off">
+        <input type="password" id="admin-pass" placeholder="รหัสผ่าน">
+        <br>
+        <button class="btn btn-primary" style="width: 100%; margin: 10px 0 5px 0;" onclick="verifyAdmin()">✅ ยืนยันการล้างข้อมูล</button>
+        <button class="btn btn-danger" style="width: 100%; margin: 0;" onclick="closeAdminModal()">❌ ยกเลิก</button>
+    </div>
+</div>
+
+<script>
+    const colors = [
+        { name: "ดำ", val: 0, hex: "#000000" }, { name: "น้ำตาล", val: 1, hex: "#8B4513" },
+        { name: "แดง", val: 2, hex: "#FF0000" }, { name: "ส้ม", val: 3, hex: "#FFA500" },
+        { name: "เหลือง", val: 4, hex: "#FFFF00" }, { name: "เขียว", val: 5, hex: "#008000" },
+        { name: "น้ำเงิน", val: 6, hex: "#0000FF" }, { name: "ม่วง", val: 7, hex: "#800080" },
+        { name: "เทา", val: 8, hex: "#808080" }, { name: "ขาว", val: 9, hex: "#FFFFFF" }
+    ];
+    const multipliers = [
+        { name: "ดำ", mul: 1, hex: "#000000" }, { name: "น้ำตาล", mul: 10, hex: "#8B4513" },
+        { name: "แดง", mul: 100, hex: "#FF0000" }, { name: "ส้ม", mul: 1000, hex: "#FFA500" },
+        { name: "เหลือง", mul: 10000, hex: "#FFFF00" }, { name: "เขียว", mul: 100000, hex: "#008000" },
+        { name: "ทอง", mul: 0.1, hex: "#FFD700" }, { name: "เงิน", mul: 0.01, hex: "#C0C0C0" }
+    ];
+    const resTolerances = [
+        { name: "น้ำตาล", tol: "±1%", hex: "#8B4513" }, { name: "แดง", tol: "±2%", hex: "#FF0000" },
+        { name: "ทอง", tol: "±5%", hex: "#FFD700" }, { name: "เงิน", tol: "±10%", hex: "#C0C0C0" }
+    ];
+    const capTolerances = [
+        { letter: "F", tol: "±1%" }, { letter: "G", tol: "±2%" },
+        { letter: "J", tol: "±5%" }, { letter: "K", tol: "±10%" }, { letter: "M", tol: "±20%" }
+    ];
+    const capUfList = [1, 2.2, 4.7, 10, 22, 33, 47, 100, 220, 330, 470, 1000, 2200, 4700];
+    const capVList = [10, 16, 25, 35, 50, 63, 100, 250, 400];
+    const indTolerances = [
+        { name: "ทอง", tol: "±5%", hex: "#FFD700", letter: "J" }, 
+        { name: "เงิน", tol: "±10%", hex: "#C0C0C0", letter: "K" }
+    ];
+    const unitCategories = {
+        "ohm": { units: [{ name: "Ω", val: 1 }, { name: "kΩ", val: 1000 }, { name: "MΩ", val: 1000000 }], baseValues: [1, 1.5, 2.2, 4.7, 10, 22, 47, 100, 220, 470, 1000] },
+        "volt": { units: [{ name: "mV", val: 0.001 }, { name: "V", val: 1 }, { name: "kV", val: 1000 }], baseValues: [1.5, 3, 5, 9, 12, 24, 110, 220, 380, 500] },
+        "amp": { units: [{ name: "µA", val: 0.000001 }, { name: "mA", val: 0.001 }, { name: "A", val: 1 }], baseValues: [0.1, 0.5, 1.5, 2, 5, 10, 20, 50, 100, 500] }
+    };
+
+    let playerName = ""; let activeGame = ""; let currentMode = ""; let currentLevel = "";
+    let score = 0; let questionCount = 0; const maxQuestions = 10; let correctAnswerStr = "";
+    let timerInterval; let timeLeft = 0; let pointsWin = 0; let pointsLose = 0;
+    
+    // เปลี่ยนชื่อหน่วยความจำเพื่อบังคับเริ่มคลังข้อสอบใหม่แบบ 999
+    let globalHistory = JSON.parse(localStorage.getItem("strictHistoryV5")) || [];
+
+    // ================= ระบบรักษาความปลอดภัย (Admin Login) =================
+    let adminActionTarget = "";
+
+    function requestAdminAccess(actionType) {
+        adminActionTarget = actionType;
+        document.getElementById("admin-id").value = "";
+        document.getElementById("admin-pass").value = "";
+        document.getElementById("admin-modal").style.display = "flex";
+    }
+
+    function closeAdminModal() {
+        document.getElementById("admin-modal").style.display = "none";
+    }
+
+    function verifyAdmin() {
+        let id = document.getElementById("admin-id").value.trim();
+        let pass = document.getElementById("admin-pass").value;
+
+        if (id === "Admin" && pass === "Kaset@1234") {
+            closeAdminModal();
+            if (adminActionTarget === "leaderboard") { executeClearLeaderboard(); } 
+            else if (adminActionTarget === "history") { executeClearHistory(); }
+        } else {
+            alert("❌ สิทธิ์เข้าถึงถูกปฏิเสธ! ID หรือรหัสผ่านไม่ถูกต้องครับ");
+        }
+    }
+
+    function executeClearHistory() {
+        globalHistory = [];
+        localStorage.removeItem("strictHistoryV5");
+        alert("ล้างประวัติคำถามเรียบร้อยแล้ว! เตรียมพร้อมสำหรับนักศึกษากลุ่มถัดไปครับ");
+    }
+
+    function executeClearLeaderboard() {
+        let filterVal = document.getElementById("leaderboard-filter").value;
+        if(filterVal === "all") {
+            localStorage.removeItem("splitLeaderboardV2"); 
+            renderLeaderboardTable();
+            alert("ล้างข้อมูลคะแนนกระดาน 'ทุกหมวดหมู่' เรียบร้อยครับ");
+        } else {
+            let scoresData = JSON.parse(localStorage.getItem("splitLeaderboardV2")) || [];
+            let newData = scoresData.filter(d => d.gameId !== filterVal); 
+            localStorage.setItem("splitLeaderboardV2", JSON.stringify(newData));
+            renderLeaderboardTable();
+            alert("ล้างข้อมูลคะแนนเฉพาะหมวดนี้เรียบร้อยครับ");
+        }
+    }
+
+    // ================= การจัดการหน้าจอ =================
+    function showScreen(screenId) {
+        document.querySelectorAll('.screen').forEach(el => el.style.display = 'none');
+        document.getElementById(screenId).style.display = 'block';
+    }
+
+    function login() {
+        let nameInput = document.getElementById("player-name").value.trim();
+        if (nameInput === "") return alert("กรุณาใส่ชื่อหรือรหัสนักศึกษาก่อนครับ!");
+        playerName = nameInput;
+        document.getElementById("display-player-name").innerText = playerName;
+        showScreen("hub-area");
+    }
+
+    function logout() { playerName = ""; document.getElementById("player-name").value = ""; showScreen("login-area"); }
+
+    function openSetup(gameType) {
+        activeGame = gameType;
+        document.getElementById("resistor-options").style.display = "none";
+        document.getElementById("capacitor-options").style.display = "none";
+        document.getElementById("inductor-options").style.display = "none";
+        document.getElementById("unit-options").style.display = "none";
+
+        let titleMap = { 'resistor': 'ตัวต้านทาน', 'capacitor': 'ตัวเก็บประจุ', 'inductor': 'ตัวเหนี่ยวนำ', 'unit': 'แปลงหน่วย' };
+        document.getElementById("setup-title").innerText = "ตั้งค่าเกม: " + titleMap[gameType];
+        document.getElementById(`${gameType}-options`).style.display = "block";
+        showScreen("setup-area");
+    }
+
+    function startGame() {
+        currentMode = document.getElementById(`${activeGame}-type`).value;
+        currentLevel = document.getElementById("difficulty-select").value;
+        
+        if(currentLevel === "beginner") { pointsWin = 10; pointsLose = 0; }
+        else if(currentLevel === "intermediate") { pointsWin = 15; pointsLose = 5; }
+        else if(currentLevel === "expert") { pointsWin = 20; pointsLose = 10; }
+
+        let titleMap = { 'resistor': 'ตัวต้านทาน', 'capacitor': 'ตัวเก็บประจุ', 'inductor': 'ตัวเหนี่ยวนำ', 'unit': 'แปลงหน่วย' };
+        document.getElementById("game-title-text").innerText = titleMap[activeGame];
+
+        score = 0; questionCount = 1;
+        globalHistory = JSON.parse(localStorage.getItem("strictHistoryV5")) || [];
+        document.getElementById("score").innerText = score;
+        
+        document.querySelectorAll("[id^='graphic-']").forEach(el => el.style.display = "none");
+        document.getElementById(`graphic-${activeGame}`).style.display = "block";
+
+        showScreen("game-area");
+        nextQuestion();
+    }
+
+    function getRandom(arr) { return arr[Math.floor(Math.random() * arr.length)]; }
+
+    // ================= Logic Functions =================
+    function formatOhms(value) {
+        if (value >= 1000000) return (value / 1000000) + " MΩ";
+        if (value >= 1000) return (value / 1000) + " kΩ";
+        return value.toFixed(value % 1 !== 0 ? 2 : 0) + " Ω";
+    }
+
+    function getResistorColorData() {
+        let b1 = getRandom(colors.slice(1, 10)), b2 = getRandom(colors), b3, mul, tol, val = 0, bCols = [];
+        if (currentMode === "4") {
+            mul = getRandom(multipliers); tol = getRandom(resTolerances.slice(2, 4)); 
+            val = ((b1.val * 10) + b2.val) * mul.mul; bCols = [b1.hex, b2.hex, mul.hex, tol.hex];
+        } else {
+            b3 = getRandom(colors); mul = getRandom(multipliers.slice(0, 6)); tol = getRandom(resTolerances.slice(0, 2)); 
+            val = ((b1.val * 100) + (b2.val * 10) + b3.val) * mul.mul; bCols = [b1.hex, b2.hex, b3.hex, mul.hex, tol.hex];
+        }
+        let fVal = formatOhms(val) + " " + tol.tol;
+        let hStr = bCols.map((c, i) => `<div class="band" style="background-color:${c}; ${i===bCols.length-1?'margin-left:30px;':''}"></div>`).join('');
+        return { html: hStr, answer: fVal, isSmd: false, rawCode: `R_Col_${b1.val}${b2.val}_${mul.mul}_${tol.tol}` };
+    }
+
+    function getResistorSmdData() {
+        let type = Math.floor(Math.random() * 3); 
+        let codeStr = "", value = 0;
+        
+        if (type === 0) { 
+            let d1 = Math.floor(Math.random() * 9) + 1, d2 = Math.floor(Math.random() * 10), m = Math.floor(Math.random() * 6);
+            codeStr = `${d1}${d2}${m}`;
+            value = (d1 * 10 + d2) * Math.pow(10, m);
+        } else if (type === 1) { 
+            let d1 = Math.floor(Math.random() * 9) + 1, d2 = Math.floor(Math.random() * 10), d3 = Math.floor(Math.random() * 10), m = Math.floor(Math.random() * 5);
+            codeStr = `${d1}${d2}${d3}${m}`;
+            value = (d1 * 100 + d2 * 10 + d3) * Math.pow(10, m);
+        } else { 
+            let d1 = Math.floor(Math.random() * 9) + 1, d2 = Math.floor(Math.random() * 10);
+            if (Math.random() > 0.5) {
+                codeStr = `${d1}R${d2}`; value = parseFloat(`${d1}.${d2}`);
+            } else {
+                codeStr = `R${d1}${d2}`; value = parseFloat(`0.${d1}${d2}`);
+            }
+        }
+        let formattedValue = formatOhms(value); 
+        return { html: `<div class="res-smd-code">${codeStr}</div>`, answer: formattedValue, isSmd: true, rawCode: `R_SMD_${codeStr}` };
+    }
+
+    function getResistorData() {
+        return currentMode === "smd" ? getResistorSmdData() : getResistorColorData();
+    }
+
+    function getCapCodeData(type) {
+        let d1 = Math.floor(Math.random() * 9) + 1, d2 = Math.floor(Math.random() * 10), m = Math.floor(Math.random() * 6);
+        let tol = capTolerances[Math.floor(Math.random() * 3) + 2]; 
+        let cStr = `${d1}${d2}${m}${tol.letter}`;
+        let v = (d1 * 10 + d2) * Math.pow(10, m);
+        let fVal = v >= 1000000 ? (v / 1000000) + " µF" : (v >= 1000 ? (v / 1000) + " nF" : v + " pF");
+        return { html: `<div class="capacitor-code">${cStr}</div>`, answer: `${fVal} (${tol.tol})`, cssClass: `cap-${type}`, rawCode: `C_${type}_${cStr}` };
+    }
+    
+    function getCapElectroData() {
+        let c = getRandom(capUfList), v = getRandom(capVList);
+        return { html: `<div class="electro-text-area"><div class="electro-val">${c}µF</div><div class="electro-volt">${v}V</div></div><div class="electro-stripe"><span>-</span><span>-</span><span>-</span></div>`, answer: `${c} µF ทนแรงดัน ${v}V`, cssClass: `cap-electro`, rawCode: `C_E_${c}_${v}` };
+    }
+
+    function getCapacitorData() {
+        let t = currentMode === "all" ? getRandom(["ceramic", "mylar", "electro"]) : currentMode;
+        return t === "electro" ? getCapElectroData() : getCapCodeData(t);
+    }
+
+    function formatHenry(val) {
+        if(val >= 1000000) return (val / 1000000) + " H";
+        if(val >= 1000) return (val / 1000) + " mH";
+        return val.toFixed(val % 1 !== 0 ? 2 : 0) + " µH";
+    }
+
+    function getIndColorData() {
+        let b1 = getRandom(colors.slice(1, 10)), b2 = getRandom(colors);
+        let mul = getRandom(multipliers.slice(0, 5).concat(multipliers.slice(6,8))), tol = getRandom(indTolerances);
+        let val = ((b1.val * 10) + b2.val) * mul.mul; let bCols = [b1.hex, b2.hex, mul.hex, tol.hex];
+        let hStr = bCols.map((c, i) => `<div class="ind-band" style="background-color:${c}; ${i===3?'margin-left:30px;':''}"></div>`).join('');
+        return { html: hStr, answer: `${formatHenry(val)} ${tol.tol}`, isSmd: false, rawCode: `L_Col_${b1.val}${b2.val}_${mul.mul}_${tol.tol}` };
+    }
+
+    function getIndSmdData() {
+        let d1 = Math.floor(Math.random() * 9) + 1, d2 = Math.floor(Math.random() * 10), cStr = "", val = 0;
+        if(Math.random() > 0.7) { cStr = `${d1}R${d2}`; val = parseFloat(`${d1}.${d2}`); } 
+        else { let m = Math.floor(Math.random() * 4); cStr = `${d1}${d2}${m}`; val = (d1 * 10 + d2) * Math.pow(10, m); }
+        let tol = getRandom(indTolerances);
+        return { html: `<div class="ind-code">${cStr}</div>`, answer: `${formatHenry(val)} ${tol.tol}`, isSmd: true, rawCode: `L_SMD_${cStr}_${tol.letter}` };
+    }
+
+    function getInductorData() {
+        let t = currentMode === "all" ? getRandom(["color", "smd"]) : currentMode;
+        return t === "color" ? getIndColorData() : getIndSmdData();
+    }
+
+    function getUnitData() {
+        let t = currentMode === "all" ? getRandom(["ohm", "volt", "amp"]) : currentMode;
+        let cat = unitCategories[t], u1, u2;
+        do { u1 = getRandom(cat.units); u2 = getRandom(cat.units); } while (u1.name === u2.name);
+        let bVal = getRandom(cat.baseValues);
+        let cVal = parseFloat((bVal * (u1.val / u2.val)).toPrecision(7)); let aStr = `${cVal} ${u2.name}`;
+        let choices = [aStr], mList = [10, 100, 0.1, 0.01, 1000, 0.001].sort(() => Math.random() - 0.5);
+        for (let m of mList) {
+            if (choices.length >= 4) break;
+            let fStr = `${parseFloat((cVal * m).toPrecision(7))} ${u2.name}`;
+            if (!choices.includes(fStr)) choices.push(fStr);
+        }
+        return { questionHTML: `${bVal} ${u1.name} &nbsp;=&nbsp; ? &nbsp;${u2.name}`, answer: aStr, choices: choices.sort(() => Math.random() - 0.5), rawCode: `U_${t}_${bVal}_${u1.name}_${u2.name}` };
+    }
+
+    function nextQuestion() {
+        if(questionCount > maxQuestions) return endGame();
+        document.getElementById("question-count").innerText = questionCount;
+        document.getElementById("feedback").innerText = "";
+        
+        let qData; let attempts = 0;
+        
+        // สุ่มโจทย์ใหม่และเช็กว่าซ้ำหรือไม่ โดยอัพเกรดเป็น 999 ครั้งเพื่อความชัวร์
+        do {
+            if(activeGame === 'resistor') qData = getResistorData();
+            else if(activeGame === 'capacitor') qData = getCapacitorData();
+            else if(activeGame === 'inductor') qData = getInductorData();
+            else if(activeGame === 'unit') qData = getUnitData();
+            
+            attempts++;
+            if(attempts > 999) { 
+                globalHistory = []; 
+                console.warn("สุ่มโจทย์เกิน 999 ครั้ง (โจทย์ในคลังหมดแล้ว) ทำการรีเซ็ตระบบเพื่อป้องกันจอค้าง"); 
+                break;
+            }
+        } while (globalHistory.includes(qData.rawCode));
+        
+        globalHistory.push(qData.rawCode);
+        localStorage.setItem("strictHistoryV5", JSON.stringify(globalHistory));
+        correctAnswerStr = qData.answer;
+        let choices = [correctAnswerStr];
+
+        if(activeGame === 'resistor') {
+            let resBody = document.getElementById("resistor-body");
+            if (qData.isSmd) {
+                resBody.className = "res-smd"; resBody.innerHTML = qData.html;
+                document.getElementById("res-wire-left").style.display = "none";
+                document.getElementById("res-wire-right").style.display = "none";
+                while (choices.length < 4) { let f = getResistorSmdData().answer; if (!choices.includes(f)) choices.push(f); }
+            } else {
+                resBody.className = "res-axial"; resBody.innerHTML = qData.html;
+                document.getElementById("res-wire-left").style.display = "block";
+                document.getElementById("res-wire-right").style.display = "block";
+                while (choices.length < 4) { let f = getResistorColorData().answer; if (!choices.includes(f)) choices.push(f); }
+            }
+        } 
+        else if(activeGame === 'capacitor') {
+            let capBody = document.getElementById("capacitor-body"), capWrapper = document.getElementById("cap-wrapper");
+            capBody.className = qData.cssClass; capBody.innerHTML = qData.html;
+            qData.cssClass === 'cap-electro' ? capWrapper.classList.add('is-electro') : capWrapper.classList.remove('is-electro');
+            let cType = qData.cssClass.replace('cap-', '');
+            while (choices.length < 4) { let f = (cType === 'electro' ? getCapElectroData() : getCapCodeData(cType)).answer; if (!choices.includes(f)) choices.push(f); }
+        }
+        else if(activeGame === 'inductor') {
+            let indBody = document.getElementById("inductor-body");
+            indBody.className = qData.isSmd ? "ind-smd" : "ind-axial"; indBody.innerHTML = qData.html;
+            document.getElementById("ind-wire-left").style.display = qData.isSmd ? "none" : "block";
+            document.getElementById("ind-wire-right").style.display = qData.isSmd ? "none" : "block";
+            while (choices.length < 4) { let f = (qData.isSmd ? getIndSmdData() : getIndColorData()).answer; if (!choices.includes(f)) choices.push(f); }
+        }
+        else if(activeGame === 'unit') {
+            document.getElementById("unit-question-display").innerHTML = qData.questionHTML; choices = qData.choices; 
+        }
+
+        choices.sort(() => Math.random() - 0.5);
+        let cDiv = document.getElementById("choices-container"); cDiv.innerHTML = "";
+        choices.forEach(c => {
+            let btn = document.createElement("button"); btn.className = "btn choice-btn"; btn.innerHTML = c;
+            btn.onclick = () => checkAnswer(c); cDiv.appendChild(btn);
+        });
+        startTimer();
+    }
+
+    function startTimer() {
+        clearInterval(timerInterval);
+        let timerDisplay = document.getElementById("timer-display");
+        if(currentLevel === "beginner") { timerDisplay.innerText = "ไม่จำกัด"; timerDisplay.style.color = "#38a169"; return; }
+        
+        timeLeft = currentLevel === "intermediate" ? 15 : 8;
+        timerDisplay.innerText = timeLeft + " วินาที"; timerDisplay.style.color = "#e53e3e";
+        
+        timerInterval = setInterval(() => {
+            timeLeft--; timerDisplay.innerText = timeLeft + " วินาที";
+            if(timeLeft <= 0) { clearInterval(timerInterval); handleTimeOut(); }
+        }, 1000);
+    }
+
+    function handleTimeOut() {
+        let fb = document.getElementById("feedback"); fb.innerText = "⏰ หมดเวลา! คำตอบคือ " + correctAnswerStr; fb.className = "wrong";
+        score = Math.max(0, score - pointsLose); document.getElementById("score").innerText = score;
+        disableChoices(); questionCount++; setTimeout(nextQuestion, 2000);
+    }
+
+    function checkAnswer(selected) {
+        clearInterval(timerInterval); disableChoices();
+        let fb = document.getElementById("feedback");
+        if (selected === correctAnswerStr) {
+            score += pointsWin; fb.innerText = "🎉 ถูกต้อง! (+" + pointsWin + ")"; fb.className = "correct";
+        } else {
+            score = Math.max(0, score - pointsLose); let loss = pointsLose > 0 ? " (-" + pointsLose + ")" : "";
+            fb.innerText = "❌ ผิด! คำตอบคือ " + correctAnswerStr + loss; fb.className = "wrong";
+        }
+        document.getElementById("score").innerText = score; questionCount++; setTimeout(nextQuestion, 1500);
+    }
+
+    function disableChoices() { document.querySelectorAll(".choice-btn").forEach(btn => btn.disabled = true); }
+
+    function endGame() {
+        alert("จบเกม! คุณได้คะแนนทั้งหมด: " + score + " คะแนน");
+        let scoresData = JSON.parse(localStorage.getItem("splitLeaderboardV2")) || [];
+        let levelTH = currentLevel === "beginner" ? "เริ่มต้น" : (currentLevel === "intermediate" ? "ปานกลาง" : "เชี่ยวชาญ");
+        
+        let mLabel = currentMode === "smd" ? "SMD" : currentMode;
+        if(activeGame === 'resistor' && currentMode !== 'smd') mLabel = currentMode + " แถบ";
+
+        let labelMap = { 'resistor': `ต้านทาน (${mLabel})`, 'capacitor': `ประจุ (${currentMode})`, 'inductor': `เหนี่ยวนำ (${mLabel})`, 'unit': `หน่วย (${currentMode})` };
+
+        scoresData.push({ gameId: activeGame, name: playerName, modeLabel: labelMap[activeGame], level: levelTH, score: score, timestamp: Date.now() });
+        scoresData.sort((a, b) => b.score - a.score);
+        localStorage.setItem("splitLeaderboardV2", JSON.stringify(scoresData));
+        showLeaderboard();
+    }
+
+    function showLeaderboard() {
+        showScreen("leaderboard-area");
+        let filterDropdown = document.getElementById("leaderboard-filter");
+        if(activeGame !== "") { filterDropdown.value = activeGame; } else { filterDropdown.value = "all"; }
+        renderLeaderboardTable();
+    }
+
+    function renderLeaderboardTable() {
+        let filterVal = document.getElementById("leaderboard-filter").value;
+        let scoresData = JSON.parse(localStorage.getItem("splitLeaderboardV2")) || [];
+        let tbody = document.querySelector("#leaderboard-table tbody"); tbody.innerHTML = "";
+
+        let filteredScores = filterVal !== "all" ? scoresData.filter(d => d.gameId === filterVal) : scoresData;
+        if (filteredScores.length === 0) return tbody.innerHTML = "<tr><td colspan='5'>ยังไม่มีข้อมูลคะแนนในหมวดนี้</td></tr>";
+
+        filteredScores.slice(0, 10).forEach((data, index) => {
+            let row = document.createElement("tr");
+            let icon = index === 0 ? "🥇" : (index === 1 ? "🥈" : (index === 2 ? "🥉" : index + 1));
+            row.innerHTML = `<td>${icon}</td><td><b>${data.name}</b></td><td>${data.modeLabel}</td><td>${data.level}</td><td style="color:#38a169; font-weight:bold;">${data.score}</td>`;
+            tbody.appendChild(row);
+        });
+    }
+</script>
+
+</body>
+</html>
