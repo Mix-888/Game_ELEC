@@ -266,7 +266,30 @@
     </div>
 </div>
 
-<script>
+<script type="module">
+    import { initializeApp } from "https://www.gstatic.com/firebasejs/12.1.0/firebase-app.js";
+
+import {
+    getDatabase,
+    ref,
+    push,
+    onValue,
+    remove
+} from "https://www.gstatic.com/firebasejs/12.1.0/firebase-database.js";
+
+const firebaseConfig = {
+  apiKey: "AIzaSyATVHNnAXtG-8bIPCgHm0x5amyiJKu2ABw",
+  authDomain: "electronics-game-elec.firebaseapp.com",
+  databaseURL: "https://electronics-game-elec-default-rtdb.asia-southeast1.firebasedatabase.app",
+  projectId: "electronics-game-elec",
+  storageBucket: "electronics-game-elec.firebasestorage.app",
+  messagingSenderId: "112263749894",
+  appId: "1:112263749894:web:cb8fd4fc347a31af7dfe87",
+  measurementId: "G-BG3G25K360"
+};
+
+const app = initializeApp(firebaseConfig);
+const db = getDatabase(app);
     const colors = [
         { name: "ดำ", val: 0, hex: "#000000" }, { name: "น้ำตาล", val: 1, hex: "#8B4513" },
         { name: "แดง", val: 2, hex: "#FF0000" }, { name: "ส้ม", val: 3, hex: "#FFA500" },
@@ -343,7 +366,7 @@
     function executeClearLeaderboard() {
         let filterVal = document.getElementById("leaderboard-filter").value;
         if(filterVal === "all") {
-            localStorage.removeItem("splitLeaderboardV2"); 
+            remove(ref(db,"leaderboard"));
             renderLeaderboardTable();
             alert("ล้างข้อมูลคะแนนกระดาน 'ทุกหมวดหมู่' เรียบร้อยครับ");
         } else {
@@ -621,20 +644,33 @@
     function disableChoices() { document.querySelectorAll(".choice-btn").forEach(btn => btn.disabled = true); }
 
     function endGame() {
-        alert("จบเกม! คุณได้คะแนนทั้งหมด: " + score + " คะแนน");
-        let scoresData = JSON.parse(localStorage.getItem("splitLeaderboardV2")) || [];
-        let levelTH = currentLevel === "beginner" ? "เริ่มต้น" : (currentLevel === "intermediate" ? "ปานกลาง" : "เชี่ยวชาญ");
-        
-        let mLabel = currentMode === "smd" ? "SMD" : currentMode;
-        if(activeGame === 'resistor' && currentMode !== 'smd') mLabel = currentMode + " แถบ";
 
-        let labelMap = { 'resistor': `ต้านทาน (${mLabel})`, 'capacitor': `ประจุ (${currentMode})`, 'inductor': `เหนี่ยวนำ (${mLabel})`, 'unit': `หน่วย (${currentMode})` };
+    alert("จบเกม! คุณได้คะแนนทั้งหมด: " + score + " คะแนน");
 
-        scoresData.push({ gameId: activeGame, name: playerName, modeLabel: labelMap[activeGame], level: levelTH, score: score, timestamp: Date.now() });
-        scoresData.sort((a, b) => b.score - a.score);
-        localStorage.setItem("splitLeaderboardV2", JSON.stringify(scoresData));
-        showLeaderboard();
-    }
+    const labelMap = {
+        resistor: "ตัวต้านทาน",
+        capacitor: "ตัวเก็บประจุ",
+        inductor: "ตัวเหนี่ยวนำ",
+        unit: "แปลงหน่วย"
+    };
+
+    const levelMap = {
+        beginner: "ผู้เริ่มต้น",
+        intermediate: "ปานกลาง",
+        expert: "ผู้เชี่ยวชาญ"
+    };
+
+    push(ref(db,"leaderboard"),{
+        gameId: activeGame,
+        name: playerName,
+        modeLabel: labelMap[activeGame],
+        level: levelMap[currentLevel],
+        score: score,
+        timestamp: Date.now()
+    });
+
+    showLeaderboard();
+}
 
     function showLeaderboard() {
         showScreen("leaderboard-area");
@@ -643,21 +679,53 @@
         renderLeaderboardTable();
     }
 
-    function renderLeaderboardTable() {
-        let filterVal = document.getElementById("leaderboard-filter").value;
-        let scoresData = JSON.parse(localStorage.getItem("splitLeaderboardV2")) || [];
-        let tbody = document.querySelector("#leaderboard-table tbody"); tbody.innerHTML = "";
+   function renderLeaderboardTable() {
 
-        let filteredScores = filterVal !== "all" ? scoresData.filter(d => d.gameId === filterVal) : scoresData;
-        if (filteredScores.length === 0) return tbody.innerHTML = "<tr><td colspan='5'>ยังไม่มีข้อมูลคะแนนในหมวดนี้</td></tr>";
+    const tbody =
+    document.querySelector("#leaderboard-table tbody");
 
-        filteredScores.slice(0, 10).forEach((data, index) => {
-            let row = document.createElement("tr");
-            let icon = index === 0 ? "🥇" : (index === 1 ? "🥈" : (index === 2 ? "🥉" : index + 1));
-            row.innerHTML = `<td>${icon}</td><td><b>${data.name}</b></td><td>${data.modeLabel}</td><td>${data.level}</td><td style="color:#38a169; font-weight:bold;">${data.score}</td>`;
-            tbody.appendChild(row);
+    onValue(ref(db,"leaderboard"),(snapshot)=>{
+
+        tbody.innerHTML="";
+
+        let scores=[];
+
+        snapshot.forEach((child)=>{
+            scores.push(child.val());
         });
-    }
+
+        scores.sort((a,b)=>b.score-a.score);
+
+        scores.slice(0,10).forEach((data,index)=>{
+
+            let icon =
+            index===0?"🥇":
+            index===1?"🥈":
+            index===2?"🥉":
+            index+1;
+
+            tbody.innerHTML += `
+            <tr>
+                <td>${icon}</td>
+                <td><b>${data.name}</b></td>
+                <td>${data.modeLabel}</td>
+                <td>${data.level}</td>
+                <td>${data.score}</td>
+            </tr>`;
+        });
+
+    });
+}
+window.login = login;
+window.logout = logout;
+window.openSetup = openSetup;
+window.startGame = startGame;
+window.showLeaderboard = showLeaderboard;
+window.renderLeaderboardTable = renderLeaderboardTable;
+window.requestAdminAccess = requestAdminAccess;
+window.verifyAdmin = verifyAdmin;
+window.closeAdminModal = closeAdminModal;
+window.showScreen = showScreen;
 </script>
 
 </body>
