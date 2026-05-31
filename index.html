@@ -182,7 +182,9 @@
         </div>
         
         <div class="timer">เวลา: <span id="timer-display"></span></div>
-
+        <div id="leaderboard-area" class="screen">
+        <div class="filter-container">
+        <select id="leaderboard-filter">
         <div id="graphic-resistor" style="display:none;">
             <div class="resistor-wrapper">
                 <div class="wire" id="res-wire-left"></div>
@@ -228,6 +230,18 @@
                 <option value="capacitor">ตัวเก็บประจุ (Capacitor)</option>
                 <option value="inductor">ตัวเหนี่ยวนำ (Inductor)</option>
                 <option value="unit">แปลงหน่วย (Unit Conversion)</option>
+            </select>
+            <br><br>
+            <label for="level-filter"><b>เลือกระดับความยาก: </b></label>
+            <select id="level-filter"
+            onchange="renderLeaderboardTable()"
+            style="width: auto; margin-bottom: 0; padding: 8px;">
+
+            <option value="all">ทุกระดับ</option>
+            <option value="ผู้เริ่มต้น">🟢 ผู้เริ่มต้น</option>
+            <option value="ปานกลาง">🟡 ปานกลาง</option>
+            <option value="ผู้เชี่ยวชาญ">🔴 ผู้เชี่ยวชาญ</option>
+
             </select>
         </div>
 
@@ -556,9 +570,9 @@ const db = getDatabase(app);
             else if(activeGame === 'unit') qData = getUnitData();
             
             attempts++;
-            if(attempts > 999) { 
+            if(attempts > 9999) { 
                 globalHistory = []; 
-                console.warn("สุ่มโจทย์เกิน 999 ครั้ง (โจทย์ในคลังหมดแล้ว) ทำการรีเซ็ตระบบเพื่อป้องกันจอค้าง"); 
+                console.warn("สุ่มโจทย์เกิน 9999 ครั้ง (โจทย์ในคลังหมดแล้ว) ทำการรีเซ็ตระบบเพื่อป้องกันจอค้าง"); 
                 break;
             }
         } while (globalHistory.includes(qData.rawCode));
@@ -680,7 +694,8 @@ const db = getDatabase(app);
     }
 
    function renderLeaderboardTable() {
-
+    const levelFilter =
+    document.getElementById("level-filter").value;
     const tbody =
     document.querySelector("#leaderboard-table tbody");
 
@@ -689,11 +704,24 @@ const db = getDatabase(app);
         tbody.innerHTML="";
 
         let scores=[];
-
+        const filterVal =
+        document.getElementById("leaderboard-filter").value;
         snapshot.forEach((child)=>{
             scores.push(child.val());
         });
+        
+        if(filterVal !== "all"){
+    scores = scores.filter(
+        item => item.gameId === filterVal
+    );
+}
 
+if(levelFilter !== "all"){
+    scores = scores.filter(
+        item => item.level === levelFilter
+    );
+}
+        
         scores.sort((a,b)=>b.score-a.score);
 
         scores.slice(0,10).forEach((data,index)=>{
